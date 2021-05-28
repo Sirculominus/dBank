@@ -20,11 +20,11 @@ contract('dBank', ([deployer, user]) => {
   describe('testing token contract...', () => {
     describe('success', () => {
       it('checking token name', async () => {
-        expect(await token.name()).to.be.eq('Decentralized Bank Currency')
+        expect(await token.name()).to.be.eq('Roar Decentralized Bank')
       })
 
       it('checking token symbol', async () => {
-        expect(await token.symbol()).to.be.eq('DBC')
+        expect(await token.symbol()).to.be.eq('ROAR')
       })
 
       it('checking token initial total supply', async () => {
@@ -69,8 +69,15 @@ contract('dBank', ([deployer, user]) => {
     })
 
     describe('failure', () => {
-      it('depositing should be rejected', async () => {
+      it('depositing too low amount should be rejected', async () => {
         await dbank.deposit({value: 10**15, from: user}).should.be.rejectedWith(EVM_REVERT) //to small amount
+      })
+
+      beforeEach(async () => {
+        await dbank.deposit({value: 10**16, from: user}) //0.01 ETH
+      })
+      it('depositing twice should be rejected', async () => {
+        await dbank.deposit({value: 10**16, from: user}).should.be.rejectedWith(EVM_REVERT)
       })
     })
   })
@@ -118,7 +125,7 @@ contract('dBank', ([deployer, user]) => {
         await dbank.deposit({value: 10**16, from: user}) //0.01 ETH
         await wait(2) //accruing interest
         await dbank.withdraw({from: deployer}).should.be.rejectedWith(EVM_REVERT) //wrong user
-      })
+     })
     })
   })
 })
